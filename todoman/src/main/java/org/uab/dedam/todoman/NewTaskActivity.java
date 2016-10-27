@@ -44,12 +44,16 @@ public class NewTaskActivity extends AppCompatActivity
         save.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                /* Comentamos y en lugar de SharedPreferences usaremos la base de datos
                 SharedPreferences preferences = getSharedPreferences("TASK_PREFS", MODE_PRIVATE);
                 SharedPreferences.Editor preferenceEditor = preferences.edit();
                 preferenceEditor.putString("task_title", taskTitle.getText().toString());
                 preferenceEditor.putString("task_description", taskDescription.getText().toString());
                 preferenceEditor.putBoolean("task_completed", taskCompleted.isChecked());
                 preferenceEditor.commit();
+                 */
+                TaskRepository taskRepository = new TaskRepository(NewTaskActivity.this);
+                taskRepository.save(taskTitle.getText().toString(), taskDescription.getText().toString());
 
                 finish();
             }
