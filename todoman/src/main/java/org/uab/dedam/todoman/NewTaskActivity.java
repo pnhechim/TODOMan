@@ -56,6 +56,9 @@ public class NewTaskActivity extends AppCompatActivity
                 taskRepository.save(taskTitle.getText().toString(), taskDescription.getText().toString());
 
                 finish();
+
+                UpdateAsyncTask backgroundTask = new UpdateAsyncTask();
+                backgroundTask.execute("update");
             }
         });
 
