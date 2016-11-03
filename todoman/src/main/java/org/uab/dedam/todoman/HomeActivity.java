@@ -1,5 +1,7 @@
 package org.uab.dedam.todoman;
 
+import android.app.AlarmManager;
+import android.app.PendingIntent;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.support.v7.app.AppCompatActivity;
@@ -30,7 +32,12 @@ public class HomeActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(HomeActivity.this, NewTaskActivity.class);
-                startActivity(intent);
+                //Comentamos para iniciar la activity con una alarma dentro de 10 segundos
+                // startActivity(intent);
+                PendingIntent pendingIntent = PendingIntent
+                        .getActivity(HomeActivity.this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+                AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
+                alarmManager.set(AlarmManager.ELAPSED_REALTIME, 10000, pendingIntent);
             }
         });
     }
