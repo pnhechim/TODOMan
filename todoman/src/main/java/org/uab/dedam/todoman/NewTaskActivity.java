@@ -1,6 +1,8 @@
 package org.uab.dedam.todoman;
 
-import android.content.Context;
+import android.app.AlarmManager;
+import android.app.PendingIntent;
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -11,7 +13,15 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class NewTaskActivity extends AppCompatActivity implements DatePickerFragment.OnDateSetCallBack, TimePickerFragment.OnTimeSetCallBack {
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
+
+public class NewTaskActivity extends AppCompatActivity
+                            implements DatePickerFragment.OnDateSetCallBack,
+                                TimePickerFragment.OnTimeSetCallBack {
 
     Button buttonCancelTask;
     Button buttonClearTask;
@@ -25,7 +35,8 @@ public class NewTaskActivity extends AppCompatActivity implements DatePickerFrag
     ImageButton imageButtonTaskSetDate;
     ImageButton imageButtonTaskSetTime;
 
-    static final String NEW_TASK_CREATED = "You have created a new task!";
+    private static final String LAUNCH_NOTIFICATION = "org.uab.dedam.todoman.LAUNCH_NOTIFICATION";
+    private static final String NEW_TASK_CREATED = "You have created a new task!";
     TextView textViewTaskEndDate;
     TextView textViewTaskEndTime;
 
@@ -88,19 +99,80 @@ public class NewTaskActivity extends AppCompatActivity implements DatePickerFrag
         buttonSaveTask.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+
+                String taskEndDate = formatDate(textViewTaskEndDate.getText().toString());
+                boolean isAlarmSet = isAlarmSet(taskEndDate);
+                String taskEndTime = formatTime(textViewTaskEndTime.getText().toString(), isAlarmSet);
+
                 TaskRepository taskRepository = new TaskRepository(NewTaskActivity.this);
                 taskRepository
                         .save(editTextTaskTitle.getText().toString(),
                                 editTextTaskDescription.getText().toString(),
                                 checkboxTaskCompleted.isChecked(),
-                                textViewTaskEndDate.getText().toString(),
-                                textViewTaskEndTime.getText().toString()
+                                taskEndDate,
+                                taskEndTime
                         );
-                Toast.makeText(getApplicationContext(), NEW_TASK_CREATED, Toast.LENGTH_SHORT).show();
-                finish();
+
+                if (isAlarmSet) {
+                    try {
+                        SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm");
+                        Date dateTimeAlarm = dateFormat.parse(taskEndDate + " " + taskEndTime);
+
+                        Calendar whenAlarm = new GregorianCalendar(
+                                dateTimeAlarm.getYear(),
+                                dateTimeAlarm.getMonth(),
+                                dateTimeAlarm.getDay()
+                        );
+
+                        whenAlarm.setTime(dateTimeAlarm);
+
+                        Intent intent = new Intent(LAUNCH_NOTIFICATION);
+                        intent.putExtra("completedTask", checkboxTaskCompleted.isChecked());
+                        intent.putExtra("titleTask", editTextTaskTitle.getText().toString());
+                        intent.putExtra("descriptionTask", editTextTaskDescription.getText().toString());
+                        PendingIntent pendingIntent = PendingIntent
+                                .getBroadcast(NewTaskActivity.this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+                        AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
+                        alarmManager.set(AlarmManager.RTC_WAKEUP, whenAlarm.getTimeInMillis(), pendingIntent);
+
+                        Toast.makeText(getApplicationContext(), NEW_TASK_CREATED, Toast.LENGTH_SHORT).show();
+                        finish();
+                    } catch (ParseException e) {
+                        e.printStackTrace();
+                    }
+            }
             }
         });
     }
+
+    public boolean isAlarmSet(String date) {
+        String labelDefaultDate = "Set end date";
+        return date.compareTo(labelDefaultDate) != 0;
+    }
+
+    public String formatDate(String date) {
+        String labelDefaultDate = "Set end date";
+
+        if(date.compareTo(labelDefaultDate) != 0)
+            return date;
+        else
+            return "";
+    }
+
+    public String formatTime(String time, boolean isAlarmSet) {
+        String labelDefaultDate = "Set end time";
+
+        if(isAlarmSet){
+            if(time.compareTo(labelDefaultDate) != 0)
+                return time;
+            else
+                return "09:00";
+        }
+        else
+            return "";
+    }
+
 
     @Override
     public void onDateSelected(String date) {

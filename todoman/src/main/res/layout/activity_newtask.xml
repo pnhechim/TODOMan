@@ -57,7 +57,6 @@
         android:layout_alignParentEnd="true" />
 
     <TextView
-        android:text="@string/endDateLabel"
         android:layout_height="wrap_content"
         android:id="@+id/textViewTaskEndDate"
         android:textAlignment="viewStart"
@@ -65,7 +64,8 @@
         android:paddingTop="7dp"
         android:layout_alignTop="@+id/imageButtonTaskSetDate"
         android:layout_alignLeft="@+id/textViewTaskEndTime"
-        android:layout_alignStart="@+id/textViewTaskEndTime" />
+        android:layout_alignStart="@+id/textViewTaskEndTime"
+        android:text="@string/endDateLabel" />
 
     <EditText
         android:layout_width="match_parent"

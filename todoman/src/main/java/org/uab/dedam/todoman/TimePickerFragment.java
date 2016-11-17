@@ -37,7 +37,7 @@ public class TimePickerFragment extends DialogFragment implements TimePickerDial
         TimePickerDialog timePicker = new TimePickerDialog(
                 parent,
                 this,
-                calendar.get(Calendar.HOUR),
+                calendar.get(Calendar.HOUR_OF_DAY),
                 calendar.get(Calendar.MINUTE),
                 true);
         return timePicker;

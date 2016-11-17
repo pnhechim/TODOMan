@@ -1,6 +1,5 @@
 package org.uab.dedam.todoman;
 
-import android.content.Context;
 import android.content.Intent;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
@@ -11,7 +10,6 @@ import android.widget.ListView;
 public class HomeActivity extends AppCompatActivity {
     private ListView listViewTaskList;
     private TaskCursorAdapter taskCursorAdapter;
-    private Context context;
     private TaskRepository taskRepository;
 
     @Override
